@@ -28,7 +28,7 @@ export default function DowJonesPage() {
         setIsLoading(true);
         const responses = await Promise.all(
           myStocks.map(symbol =>
-            fetch(`http://localhost:5000/${symbol}?adapcDays=${currAdapcDays}&adpcDays=${currAdpcDays}&advDays=${currAdvDays}`).then(res => res.json())
+            fetch(`https://stock-tracking-and-analysis.onrender.com/${symbol}?adapcDays=${currAdapcDays}&adpcDays=${currAdpcDays}&advDays=${currAdvDays}`).then(res => res.json())
           )
         );
         setOriginalStockList(responses);

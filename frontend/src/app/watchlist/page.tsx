@@ -41,7 +41,7 @@ export default function WatchlistPage() {
         setIsLoading(true);
         const responses = await Promise.all(
           Object.keys(localStorage).map(symbol =>
-            fetch(`http://localhost:5000/${symbol}?adapcDays=${currAdapcDays}&adpcDays=${currAdpcDays}&advDays=${currAdvDays}`).then(res => res.json())
+            fetch(`https://stock-tracking-and-analysis.onrender.com/${symbol}?adapcDays=${currAdapcDays}&adpcDays=${currAdpcDays}&advDays=${currAdvDays}`).then(res => res.json())
           )
         );
         setCurrStocks(responses);
@@ -57,7 +57,7 @@ export default function WatchlistPage() {
 
   const fetchAndStoreStockData = async (symbol: string) => {
     try {
-      fetch(`http://localhost:5000/${symbol}?adapcDays=${currAdapcDays}&adpcDays=${currAdpcDays}&advDays=${currAdvDays}`)
+      fetch(`https://stock-tracking-and-analysis.onrender.com/${symbol}?adapcDays=${currAdapcDays}&adpcDays=${currAdpcDays}&advDays=${currAdvDays}`)
         .then(res => res.json())
         .then(stockData => {
           if (stockData["currentPrice"] > 0) {
