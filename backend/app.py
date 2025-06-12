@@ -9,21 +9,63 @@ CORS(app)  # Allow requests from frontend
 def hello():
     return jsonify({"message": "Hello from Flask!"})
 
+# @app.route("/<symbol>")
+# def get_stock(symbol):
+#     try:
+#         stock = yf.Ticker(symbol)  # Create a yfinance Ticker object
+#         info = stock.info  # Fetch stock info dictionary
+#         # Pick out useful data fields from info
+#         hist = stock.history(period="11d")
+#         closing_prices = hist["Close"].to_list()
+#         volumes = hist["Volume"].to_list()
+
+#         # print(closing_prices)
+#         # print(get_adpc(closing_prices, False))
+
+#         data = {
+#             "ticker": symbol.upper(),               # Normalize ticker to uppercase
+#             "currentPrice": info.get("currentPrice"),
+#             "previousClose": info.get("previousClose"),
+#             "open": info.get("open"),
+#             "dayHigh": info.get("dayHigh"),
+#             "dayLow": info.get("dayLow"),
+#             "volume": info.get("volume"),
+#             "currency": info.get("currency"),
+#             "longName": info.get("longName"),
+#             "adapc": get_adpc(closing_prices),
+#             "adpc": get_adpc(closing_prices, False),
+#             "averageVolume": get_avg_volume(volumes),
+#             "peRatio": info.get("trailingPE"),
+#             "eps": info.get("trailingEps")
+#         }
+#         return jsonify(data)  # Return the selected data as JSON
+
+#     except Exception as e:
+#         # If something goes wrong (invalid ticker, network error, etc), return an error
+#         return jsonify({"error": str(e)}), 500
+    
 @app.route("/<symbol>")
 def get_stock(symbol):
+
+    adapc_days = request.args.get('adapcDays', default=5, type=int)
+    adpc_days = request.args.get('adpcDays', default=5, type=int)
+    adv_days = request.args.get('advDays', default=5, type=int)
+
     try:
-        stock = yf.Ticker(symbol)  # Create a yfinance Ticker object
-        info = stock.info  # Fetch stock info dictionary
-        # Pick out useful data fields from info
-        hist = stock.history(period="11d")
+        stock = yf.Ticker(symbol)  
+        info = stock.info
+        num_days_of_interest = max(adapc_days, adpc_days, adv_days)  
+        hist = stock.history(period=f"{num_days_of_interest}d")
+
         closing_prices = hist["Close"].to_list()
         volumes = hist["Volume"].to_list()
 
-        # print(closing_prices)
-        # print(get_adpc(closing_prices, False))
+        arr = closing_prices[-adapc_days:]
+        arr2 = closing_prices[-adpc_days:]
+        arr3 = volumes[-adv_days:]
 
         data = {
-            "ticker": symbol.upper(),               # Normalize ticker to uppercase
+            "ticker": symbol.upper(),   
             "currentPrice": info.get("currentPrice"),
             "previousClose": info.get("previousClose"),
             "open": info.get("open"),
@@ -32,14 +74,15 @@ def get_stock(symbol):
             "volume": info.get("volume"),
             "currency": info.get("currency"),
             "longName": info.get("longName"),
-            "adapc": get_adpc(closing_prices),
-            "adpc": get_adpc(closing_prices, False),
-            "averageVolume": get_avg_volume(volumes)
+            "adapc": get_adpc(arr),
+            "adpc": get_adpc(arr2, False),
+            "averageVolume": get_avg_volume(arr3),
+            "peRatio": info.get("trailingPE"),
+            "eps": info.get("trailingEps")
         }
-        return jsonify(data)  # Return the selected data as JSON
+        return jsonify(data)  
 
     except Exception as e:
-        # If something goes wrong (invalid ticker, network error, etc), return an error
         return jsonify({"error": str(e)}), 500
 
 # @app.route('/api/<field>', methods=['GET'])

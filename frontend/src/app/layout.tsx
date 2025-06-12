@@ -31,6 +31,12 @@ export default function RootLayout({
                 <Link href="/smallcap" className="hover:text-blue-600 transition-colors">S&P SmallCap 600</Link>
               </li>
               <li>
+                <Link href="/dow-jones" className="hover:text-blue-600 transition-colors">Dow Jones</Link>
+              </li>
+              <li>
+                <Link href="/watchlist" className="hover:text-blue-600 transition-colors">Watchlist</Link>
+              </li>
+              <li>
                 <Link href="/alerts" className="hover:text-blue-600 transition-colors">Alerts</Link>
               </li>
               <li>
