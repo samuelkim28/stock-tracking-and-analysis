@@ -3,57 +3,28 @@ from flask_cors import CORS
 import yfinance as yf
 
 app = Flask(__name__)
-CORS(app)  # Allow requests from frontend
+CORS(app) 
 
 @app.route("/")
 def hello():
     return jsonify({"message": "Hello from Flask!"})
-
-# @app.route("/<symbol>")
-# def get_stock(symbol):
-#     try:
-#         stock = yf.Ticker(symbol)  # Create a yfinance Ticker object
-#         info = stock.info  # Fetch stock info dictionary
-#         # Pick out useful data fields from info
-#         hist = stock.history(period="11d")
-#         closing_prices = hist["Close"].to_list()
-#         volumes = hist["Volume"].to_list()
-
-#         # print(closing_prices)
-#         # print(get_adpc(closing_prices, False))
-
-#         data = {
-#             "ticker": symbol.upper(),               # Normalize ticker to uppercase
-#             "currentPrice": info.get("currentPrice"),
-#             "previousClose": info.get("previousClose"),
-#             "open": info.get("open"),
-#             "dayHigh": info.get("dayHigh"),
-#             "dayLow": info.get("dayLow"),
-#             "volume": info.get("volume"),
-#             "currency": info.get("currency"),
-#             "longName": info.get("longName"),
-#             "adapc": get_adpc(closing_prices),
-#             "adpc": get_adpc(closing_prices, False),
-#             "averageVolume": get_avg_volume(volumes),
-#             "peRatio": info.get("trailingPE"),
-#             "eps": info.get("trailingEps")
-#         }
-#         return jsonify(data)  # Return the selected data as JSON
-
-#     except Exception as e:
-#         # If something goes wrong (invalid ticker, network error, etc), return an error
-#         return jsonify({"error": str(e)}), 500
     
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204
+
 @app.route("/<symbol>")
 def get_stock(symbol):
-
     adapc_days = request.args.get('adapcDays', default=5, type=int)
     adpc_days = request.args.get('adpcDays', default=5, type=int)
     adv_days = request.args.get('advDays', default=5, type=int)
 
     try:
         stock = yf.Ticker(symbol)  
-        info = stock.info
+        try:
+            info = stock.fast_info
+        except Exception as e:
+            print("FAILED TO FETCH FAST INFO:", str(e))
         num_days_of_interest = max(adapc_days, adpc_days, adv_days)  
         hist = stock.history(period=f"{num_days_of_interest}d")
 
@@ -66,12 +37,12 @@ def get_stock(symbol):
 
         data = {
             "ticker": symbol.upper(),   
-            "currentPrice": info.get("currentPrice"),
+            "currentPrice": info.get("lastPrice"),
             "previousClose": info.get("previousClose"),
             "open": info.get("open"),
             "dayHigh": info.get("dayHigh"),
             "dayLow": info.get("dayLow"),
-            "volume": info.get("volume"),
+            "volume": info.get("lastVolume"),
             "currency": info.get("currency"),
             "longName": info.get("longName"),
             "adapc": get_adpc(arr),
@@ -81,71 +52,6 @@ def get_stock(symbol):
             "eps": info.get("trailingEps")
         }
         return jsonify(data)  
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-# @app.route('/api/<field>', methods=['GET'])
-# def get_previous_data(field):
-#     symbol = request.args.get('symbol')
-#     days = request.args.get('days', default=5, type=int)
-
-#     if not symbol:
-#         return jsonify({"error": "Missing 'symbol' parameter"}), 400
-
-#     try:
-#         ticker = yf.Ticker(symbol)
-#         hist = ticker.history(period=f"{days}d")
-
-#         columnName = 'Close'
-#         if field == 'closing-prices':
-#             columnName = 'Close'
-#         if field == 'volume':
-#             columnName = 'Volume'
-            
-#         fieldValues = hist[columnName]
-
-#         # Convert to date: price dictionary
-#         result = {str(date.date()): float(price) for date, price in fieldValues.items()}
-
-#         return jsonify(result)
-
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
-    
-@app.route('/stats/<stat>', methods=['GET'])
-def get_adapc_data(stat):
-    symbol = request.args.get('symbol')
-    days = request.args.get('days', default=5, type=int)
-
-    if not symbol:
-        return jsonify({"error": "Missing 'symbol' parameter"}), 400
-
-    try:
-        ticker = yf.Ticker(symbol)
-        hist = ticker.history(period=f"{days}d")
-        closing_prices = hist["Close"].to_list()
-        volumes = hist["Volume"].to_list()
-        adapc = 0
-        adpc = 0
-        volume = 0
-        data = {}
-        if stat == "adapc":
-            adapc = get_adpc(closing_prices)
-            data = {
-                "adapc": adapc 
-            }            
-        if stat == "adpc":
-            adpc = get_adpc(closing_prices, False)
-            data = {
-                "adpc": adpc 
-            } 
-        if stat == "volume":
-            volume = get_avg_volume(volumes)
-            data = {
-                "adv": volume 
-            } 
-        return jsonify(data)
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

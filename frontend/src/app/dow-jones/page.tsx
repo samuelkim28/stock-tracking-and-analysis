@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Stock } from "@/types/stock";
 import StockTable from "@/components/StockTable";
-import getCompareFunction from "@/lib/helpers"
+import { getCompareFunction, getApiEndpoint} from "@/lib/helpers"
 import DaysSelector from "@/components/DaysSelector";
 
 const myStocks = ['AAPL', 'AMGN', 'AMZN', 'AXP', 'BA', 'CAT', 'CRM', 'CSCO', 'CVX', 'DIS', 'GS', 'HD', 'HON', 'IBM', 'JNJ', 'JPM', 'KO', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'NVDA', 'PG', 'SHW', 'TRV', 'UNH', 'V', 'VZ', 'WMT']
@@ -28,7 +28,7 @@ export default function DowJonesPage() {
         setIsLoading(true);
         const responses = await Promise.all(
           myStocks.map(symbol =>
-            fetch(`https://stock-tracking-and-analysis.onrender.com/${symbol}?adapcDays=${currAdapcDays}&adpcDays=${currAdpcDays}&advDays=${currAdvDays}`).then(res => res.json())
+            fetch(getApiEndpoint(symbol, currAdapcDays, currAdpcDays, currAdvDays)).then(res => res.json())
           )
         );
         setOriginalStockList(responses);

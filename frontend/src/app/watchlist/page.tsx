@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Stock } from "@/types/stock";
 import StockTable from "@/components/StockTable";
 import WatchlistForm from "./WatchlistForm";
-import getCompareFunction from "@/lib/helpers"
+import { getCompareFunction, getApiEndpoint } from "@/lib/helpers"
 import DaysSelector from "@/components/DaysSelector";
 
 function getStocksFromLocalStorage() {
@@ -41,7 +41,7 @@ export default function WatchlistPage() {
         setIsLoading(true);
         const responses = await Promise.all(
           Object.keys(localStorage).map(symbol =>
-            fetch(`https://stock-tracking-and-analysis.onrender.com/${symbol}?adapcDays=${currAdapcDays}&adpcDays=${currAdpcDays}&advDays=${currAdvDays}`).then(res => res.json())
+            fetch(getApiEndpoint(symbol, currAdapcDays, currAdpcDays, currAdvDays)).then(res => res.json())
           )
         );
         setCurrStocks(responses);
@@ -57,7 +57,7 @@ export default function WatchlistPage() {
 
   const fetchAndStoreStockData = async (symbol: string) => {
     try {
-      fetch(`https://stock-tracking-and-analysis.onrender.com/${symbol}?adapcDays=${currAdapcDays}&adpcDays=${currAdpcDays}&advDays=${currAdvDays}`)
+      fetch(getApiEndpoint(symbol, currAdapcDays, currAdpcDays, currAdvDays))
         .then(res => res.json())
         .then(stockData => {
           if (stockData["currentPrice"] > 0) {

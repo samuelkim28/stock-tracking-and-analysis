@@ -25,6 +25,7 @@
 .DS_Store
 *.pem
 .vscode
+/backend/__pycache__/
 
 # debug
 npm-debug.log*
