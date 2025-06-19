@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Stock } from "@/types/stock";
 import StockTable from "@/components/StockTable";
-import { getCompareFunction, getApiEndpoint} from "@/lib/helpers"
+import { getCompareFunction, getApiEndpointForMultipleStocks, batchStocks } from "@/lib/helpers"
 import DaysSelector from "@/components/DaysSelector";
 
 const myStocks = ['AAPL', 'AMGN', 'AMZN', 'AXP', 'BA', 'CAT', 'CRM', 'CSCO', 'CVX', 'DIS', 'GS', 'HD', 'HON', 'IBM', 'JNJ', 'JPM', 'KO', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'NVDA', 'PG', 'SHW', 'TRV', 'UNH', 'V', 'VZ', 'WMT']
@@ -26,12 +26,18 @@ export default function DowJonesPage() {
     const fetchStocksData = async () => {
       try {
         setIsLoading(true);
-        const responses = await Promise.all(
-          myStocks.map(symbol =>
-            fetch(getApiEndpoint(symbol, currAdapcDays, currAdpcDays, currAdvDays)).then(res => res.json())
-          )
-        );
-        setOriginalStockList(responses);
+        const batches = batchStocks(myStocks);
+        const retrievedStockList: Stock[] = [];
+
+        for (const batch of batches) {
+          const stocksString = batch.join();
+          const resp = await fetch(getApiEndpointForMultipleStocks(stocksString, currAdapcDays, currAdpcDays, currAdvDays));
+          const data = await resp.json();
+          const stocks = Object.values(data) as Stock[];
+          retrievedStockList.push(...stocks);
+        }
+        const validStocks = retrievedStockList.filter(stock => stock.ticker && typeof stock.ticker === 'string');
+        setOriginalStockList(validStocks);
       } catch (err) {
         console.error("Failed to fetch stock data:", err);
       } finally {
