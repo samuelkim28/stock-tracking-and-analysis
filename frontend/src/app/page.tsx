@@ -59,10 +59,13 @@ export default function HomePage() {
 
   return (
     <>
-      <h1 className="font-bold pb-3">Home Page</h1>  
+      <h1 className="text-lg font-semibold mb-2">S&P 500</h1>  
       <br></br>
       {isLoading ? (
-        <p>Loading stock data...</p>
+        <div className="flex justify-center items-center py-10">
+          <div className="w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+          <span className="ml-3 text-blue-600 font-medium">Loading stock data...</span>
+        </div>
       ) : (
         <StockTable 
           sortedStocks={sortedStocks} 

@@ -16,36 +16,36 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="flex min-h-screen bg-gray-300">
-        <aside className="w-64 bg-white shadow-md p-6 flex flex-col space-y-6">
-          <h1 className="font-bold text-2xl">Stock Tracker</h1>
+      <body className="flex min-h-screen bg-gray-100 text-gray-800 font-sans">
+        {/* Sidebar */}
+        <aside className="w-64 bg-white shadow-lg p-6 flex flex-col space-y-8">
+          <h1 className="text-xl font-semibold text-blue-700 uppercase">Stock Tracker</h1>
           <nav>
-            <ul className="flex flex-col space-y-4 text-lg">
-              <li>
-                <Link href="/" className="hover:text-blue-600 transition-colors">S&P 500</Link>
-              </li>
-              <li>
-                <Link href="/midcap" className="hover:text-blue-600 transition-colors">S&P MidCap 400</Link>
-              </li>
-              <li>
-                <Link href="/smallcap" className="hover:text-blue-600 transition-colors">S&P SmallCap 600</Link>
-              </li>
-              <li>
-                <Link href="/dow-jones" className="hover:text-blue-600 transition-colors">Dow Jones</Link>
-              </li>
-              <li>
-                <Link href="/watchlist" className="hover:text-blue-600 transition-colors">Watchlist</Link>
-              </li>
-              <li>
-                <Link href="/alerts" className="hover:text-blue-600 transition-colors">Alerts</Link>
-              </li>
-              <li>
-                <Link href="/settings" className="hover:text-blue-600 transition-colors">Settings</Link>
-              </li>
+            <ul className="flex flex-col space-y-4 text-base font-medium">
+              {[
+                { label: "S&P 500", href: "/" },
+                { label: "S&P MidCap 400", href: "/midcap" },
+                { label: "S&P SmallCap 600", href: "/smallcap" },
+                { label: "Dow Jones", href: "/dow-jones" },
+                { label: "Watchlist", href: "/watchlist" },
+                { label: "Alerts", href: "/alerts" },
+                { label: "Settings", href: "/settings" },
+              ].map(({ label, href }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="hover:text-blue-600 transition-colors duration-200"
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
         </aside>
-        <main>{children}</main>
+
+        {/* Main Content */}
+        <main className="flex-1 p-8 overflow-y-auto">{children}</main>
       </body>
     </html>
   );
