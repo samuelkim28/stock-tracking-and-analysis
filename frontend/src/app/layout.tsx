@@ -23,10 +23,10 @@ export default function RootLayout({
           <nav>
             <ul className="flex flex-col space-y-4 text-base font-medium">
               {[
-                { label: "S&P 500", href: "/" },
+                { label: "Dow Jones", href: "/" },
+                { label: "S&P 500", href: "/largecap" },                
                 { label: "S&P MidCap 400", href: "/midcap" },
                 { label: "S&P SmallCap 600", href: "/smallcap" },
-                { label: "Dow Jones", href: "/dow-jones" },
                 { label: "Watchlist", href: "/watchlist" },
                 { label: "Alerts", href: "/alerts" },
                 { label: "Settings", href: "/settings" },
